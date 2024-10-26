@@ -1,24 +1,27 @@
 const { combineRgb, InstanceStatus } = require('@companion-module/base')
 
-
 module.exports = async function (self) {
 	self.setFeedbackDefinitions({
 		SQLQuery: {
 			type: 'advanced',
 			name: 'Update variable via SQL query',
-			description: 'Execute an SQL query and use its result to set the value of a variable. Variables can be used on any button. The variable will be set to the first field of the first row of the query result.',
-			options: [ {
-				type: 'textinput',
-				label: 'SQL query',
-				id: 'query',
-				useVariables: true,
-			}, {
-				type: 'textinput',
-				label: 'Variable',
-				id: 'variable',
-				regex: '/^[a-zA-Z0-9_]+$/',
-				default: '',
-			} ],
+			description:
+				'Execute an SQL query and use its result to set the value of a variable. Variables can be used on any button. The variable will be set to the first field of the first row of the query result.',
+			options: [
+				{
+					type: 'textinput',
+					label: 'SQL query',
+					id: 'query',
+					useVariables: true,
+				},
+				{
+					type: 'textinput',
+					label: 'Variable',
+					id: 'variable',
+					regex: '/^[a-zA-Z0-9_]+$/',
+					default: '',
+				},
+			],
 			callback: () => {
 				// Nothing to do, as this feeds a variable
 				return {}
@@ -27,7 +30,7 @@ module.exports = async function (self) {
 				self.subscriptions.set(feedback.id, {
 					variableName: feedback.options.variable,
 					sqlQuery: feedback.options.query,
-					value: null
+					value: null,
 				})
 				if (self.isInitialized) {
 					self.updateVariables(feedback.id)
@@ -35,15 +38,15 @@ module.exports = async function (self) {
 			},
 			unsubscribe: (feedback) => {
 				self.subscriptions.delete(feedback.id)
-			}
+			},
 		},
 	})
 
 	if (self.pollInterval != undefined) {
 		clearInterval(pollInterval)
 	}
-	self.pollInterval = setInterval( async () => {
-		self.subscriptions.forEach( async (subscription) => { 
+	self.pollInterval = setInterval(async () => {
+		self.subscriptions.forEach(async (subscription) => {
 			var query = await self.parseVariablesInString(subscription.sqlQuery)
 			try {
 				const [results, fields] = await self.pool.query(query)
@@ -58,13 +61,11 @@ module.exports = async function (self) {
 					self.updateStatus(InstanceStatus.Ok)
 					self.lastError = 0
 				}
-					
 			} catch (err) {
-				self.log("error", JSON.stringify(err))
+				self.log('error', JSON.stringify(err))
 				self.updateStatus(InstanceStatus.ConnectionFailure, JSON.stringify(err))
-				self.lastError=Date.now()
+				self.lastError = Date.now()
 			}
-
 		})
 	}, self.config.pollinterval)
 }

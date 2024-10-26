@@ -3,7 +3,7 @@ const UpgradeScripts = require('./upgrades')
 const UpdateActions = require('./actions')
 const UpdateFeedbacks = require('./feedbacks')
 
-const mysql = require('mysql2/promise');
+const mysql = require('mysql2/promise')
 
 class ModuleInstance extends InstanceBase {
 	isInitialized = false
@@ -22,7 +22,7 @@ class ModuleInstance extends InstanceBase {
 			//this.updateVariableDefinitions() // export variable definitions
 		} catch (err) {
 			this.updateStatus(InstanceStatus.UnknownError, String(err))
-			this.log("error", String(err))
+			this.log('error', String(err))
 		}
 	}
 	// When module gets deleted
@@ -40,23 +40,23 @@ class ModuleInstance extends InstanceBase {
 
 	async connect() {
 		var settings = {
-		    host: this.config.host,
-		    port: this.config.port,
-		    user: this.config.user,
-		    database: this.config.database,
-		    waitForConnections: true,
+			host: this.config.host,
+			port: this.config.port,
+			user: this.config.user,
+			database: this.config.database,
+			waitForConnections: true,
 		}
-		if (this.config.password != "") {
-		    settings.password = this.config.password
+		if (this.config.password != '') {
+			settings.password = this.config.password
 		}
 		try {
-		    this.pool = await mysql.createPool(settings)
-		    this.updateStatus(InstanceStatus.Ok)
-		    this.isInitialized = true
-		    await this.updateFeedbacks() // export feedbacks
+			this.pool = await mysql.createPool(settings)
+			this.updateStatus(InstanceStatus.Ok)
+			this.isInitialized = true
+			await this.updateFeedbacks() // export feedbacks
 		} catch (err) {
-		    this.updateStatus(InstanceStatus.ConnectionFailure, String(err))
-		    this.log("error", String(err))
+			this.updateStatus(InstanceStatus.ConnectionFailure, String(err))
+			this.log('error', String(err))
 		}
 	}
 
@@ -79,24 +79,24 @@ class ModuleInstance extends InstanceBase {
 				min: 1,
 				max: 65535,
 			},
-                        {
-                                type: 'textinput',
-                                id: 'user',
-                                label: 'Username',
-                                width: 6,
-                        },
-                        {
-                                type: 'textinput',
-                                id: 'password',
-                                label: 'Password',
-                                width: 6,
-                        },
-                        {
-                                type: 'textinput',
-                                id: 'database',
-                                label: 'Database',
-                                width: 12,
-                        },
+			{
+				type: 'textinput',
+				id: 'user',
+				label: 'Username',
+				width: 6,
+			},
+			{
+				type: 'textinput',
+				id: 'password',
+				label: 'Password',
+				width: 6,
+			},
+			{
+				type: 'textinput',
+				id: 'database',
+				label: 'Database',
+				width: 12,
+			},
 			{
 				type: 'number',
 				id: 'pollinterval',
@@ -113,7 +113,7 @@ class ModuleInstance extends InstanceBase {
 				tooltip: 'Reset variables on init and on connect',
 				width: 6,
 				default: true,
-			}
+			},
 		]
 	}
 
@@ -125,7 +125,7 @@ class ModuleInstance extends InstanceBase {
 				return
 			}
 			variables.add(subscription.variableName)
-			if (callerId === null || callerId ===subscriptionId) {
+			if (callerId === null || callerId === subscriptionId) {
 				defaultValues[subscription.variableName] = ''
 			}
 		})
