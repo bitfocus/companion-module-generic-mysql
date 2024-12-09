@@ -17,7 +17,6 @@ class ModuleInstance extends InstanceBase {
 		{ id: 'object', label: 'Object' },
 	]
 
-
 	constructor(internal) {
 		super(internal)
 	}
@@ -44,7 +43,7 @@ class ModuleInstance extends InstanceBase {
 		}
 		config.pollinterval = parseFloat(config.pollinterval)
 		if (isNaN(config.pollinterval)) {
-			this.updateStatus(InstanceStatus.BadConfig, "Poll interval must be a number")
+			this.updateStatus(InstanceStatus.BadConfig, 'Poll interval must be a number')
 			return
 		}
 		this.config = config
@@ -69,7 +68,7 @@ class ModuleInstance extends InstanceBase {
 			await this.updateFeedbacks() // export feedbacks
 		} catch (err) {
 			this.updateStatus(InstanceStatus.ConnectionFailure, String(err))
-			this.log('error', "CONNECT" + String(err))
+			this.log('error', 'CONNECT' + String(err))
 		}
 	}
 
@@ -181,7 +180,7 @@ class ModuleInstance extends InstanceBase {
 		if (request.params == undefined) {
 			query = await this.parseVariablesInString(request.sqlQuery)
 		} else {
-			for (var i=0; i< request.params.length; i++) {
+			for (var i = 0; i < request.params.length; i++) {
 				params[i] = await this.parseVariablesInString(request.params[i])
 			}
 		}
@@ -189,30 +188,30 @@ class ModuleInstance extends InstanceBase {
 			var results
 			var fields
 			if (query != null) {
-				[results, fields] = await this.pool.query({
+				;[results, fields] = await this.pool.query({
 					sql: query,
-					rowsAsArray: (request.format == 'array'),
+					rowsAsArray: request.format == 'array',
 				})
 			} else {
-				[results, fields] = await this.pool.execute({
+				;[results, fields] = await this.pool.execute({
 					sql: request.sqlQuery,
 					values: params,
-					rowsAsArray: (request.format == 'array'),
+					rowsAsArray: request.format == 'array',
 				})
 			}
 			if (request.variableName != undefined) {
 				var value
-				switch(request.format ?? 'json') {
+				switch (request.format ?? 'json') {
 					case 'json':
 						value = JSON.stringify(results)
-						break;
+						break
 					case 'first':
 						value = results[0][Object.keys(results[0])[0]]
-						break;
+						break
 					case 'object':
 					case 'array':
 						value = results
-						break;
+						break
 				}
 				if (!areValuesEqual(request.value, value)) {
 					request.value = value
@@ -223,7 +222,7 @@ class ModuleInstance extends InstanceBase {
 				this.updateStatus(InstanceStatus.Ok)
 				this.lastError = 0
 			}
-		} catch(err) {
+		} catch (err) {
 			this.log('error', JSON.stringify(err))
 			this.updateStatus(InstanceStatus.ConnectionFailure, JSON.stringify(err))
 			this.lastError = Date.now()
@@ -231,46 +230,39 @@ class ModuleInstance extends InstanceBase {
 	}
 }
 
-
 function areValuesEqual(value1, value2) {
-  const isEqual = (a, b) => {
-    // If types are different, they can't be equal
-    if (typeof a !== typeof b) return false;
+	const isEqual = (a, b) => {
+		// If types are different, they can't be equal
+		if (typeof a !== typeof b) return false
 
-    // Check for strings
-    if (typeof a === 'string' || typeof a === 'number') {
-      return a === b;
-    }
+		// Check for strings
+		if (typeof a === 'string' || typeof a === 'number') {
+			return a === b
+		}
 
-    // Check for arrays
-    if (Array.isArray(a) && Array.isArray(b)) {
-      return (
-        a.length === b.length &&
-        a.every((element, index) => isEqual(element, b[index]))
-      );
-    }
+		// Check for arrays
+		if (Array.isArray(a) && Array.isArray(b)) {
+			return a.length === b.length && a.every((element, index) => isEqual(element, b[index]))
+		}
 
-    if (typeof a === 'object') {
-      // Check for objects
-      if (a == null && b == null) {
-    	  return true;
-      }
+		if (typeof a === 'object') {
+			// Check for objects
+			if (a == null && b == null) {
+				return true
+			}
 
-      if (a !== null && b !== null) {
-        const aKeys = Object.keys(a);
-        const bKeys = Object.keys(b);
-        return (
-          aKeys.length === bKeys.length &&
-          aKeys.every(key => b.hasOwnProperty(key) && isEqual(a[key], b[key]))
-        );
-      }
-    }
+			if (a !== null && b !== null) {
+				const aKeys = Object.keys(a)
+				const bKeys = Object.keys(b)
+				return aKeys.length === bKeys.length && aKeys.every((key) => b.hasOwnProperty(key) && isEqual(a[key], b[key]))
+			}
+		}
 
-    // Fallback for other types
-    return false;
-  };
+		// Fallback for other types
+		return false
+	}
 
-  return isEqual(value1, value2);
+	return isEqual(value1, value2)
 }
 
 runEntrypoint(ModuleInstance, UpgradeScripts)

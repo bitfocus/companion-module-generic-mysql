@@ -15,21 +15,23 @@ module.exports = function (self) {
 					label: 'SQL Query',
 					useVariables: true,
 				},
-                                {
-                                        type: 'textinput',
-                                        label: 'Result Variable (optional)',
-                                        id: 'variable',
-                                        regex: '/^[a-zA-Z0-9_]+$/',
-                                        default: '',
-                                },
-                                {
-                                        type: 'dropdown',
-                                        label: 'How to store the result in the variable',
-                                        id: 'format',
-                                        default: self.FORMATS[1].id,
-                                        choices: self.FORMATS,
-					isVisible: (options) => { return options.variable != "" }
-                                },
+				{
+					type: 'textinput',
+					label: 'Result Variable (optional)',
+					id: 'variable',
+					regex: '/^[a-zA-Z0-9_]+$/',
+					default: '',
+				},
+				{
+					type: 'dropdown',
+					label: 'How to store the result in the variable',
+					id: 'format',
+					default: self.FORMATS[1].id,
+					choices: self.FORMATS,
+					isVisible: (options) => {
+						return options.variable != ''
+					},
+				},
 			],
 			callback: async (event) => {
 				await self.processDBRequest(self.requests.get(event.id))
@@ -46,10 +48,9 @@ module.exports = function (self) {
 					self.updateVariables(action.id)
 				}
 			},
-                        unsubscribe: (action) => {
-                                self.requests.delete(action.id)
-                        },
-
+			unsubscribe: (action) => {
+				self.requests.delete(action.id)
+			},
 		},
 		prepSQL: {
 			name: 'Execute Prepared SQL Statement',
@@ -68,21 +69,23 @@ module.exports = function (self) {
 					useVariables: false,
 					default: '',
 				},
-                                {
-                                        type: 'textinput',
-                                        label: 'Result Variable (optional)',
-                                        id: 'variable',
-                                        regex: '/^[a-zA-Z0-9_]+$/',
-                                        default: '',
-                                },
-                                {
-                                        type: 'dropdown',
-                                        label: 'How to store the result in the variable',
-                                        id: 'format',
-                                        default: self.FORMATS[1].id,
-                                        choices: self.FORMATS,
-					isVisible: (options) => { return options.variable != "" }
-                                },
+				{
+					type: 'textinput',
+					label: 'Result Variable (optional)',
+					id: 'variable',
+					regex: '/^[a-zA-Z0-9_]+$/',
+					default: '',
+				},
+				{
+					type: 'dropdown',
+					label: 'How to store the result in the variable',
+					id: 'format',
+					default: self.FORMATS[1].id,
+					choices: self.FORMATS,
+					isVisible: (options) => {
+						return options.variable != ''
+					},
+				},
 				{
 					id: 'var1',
 					type: 'textinput',
@@ -196,9 +199,9 @@ module.exports = function (self) {
 					self.updateVariables(action.id)
 				}
 			},
-                        unsubscribe: (action) => {
-                                self.requests.delete(action.id)
-                        },
+			unsubscribe: (action) => {
+				self.requests.delete(action.id)
+			},
 		},
 	})
 }

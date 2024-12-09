@@ -13,7 +13,8 @@
 	},
 	"dependencies": {
 		"@companion-module/base": "~1.11.0",
-		"mysql2": "^3.11.3"
+		"mysql2": "^3.11.3",
+		"prettier": "^3.4.2"
 	},
 	"devDependencies": {
 		"@companion-module/tools": "^2.1.0"

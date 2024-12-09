@@ -1,13 +1,11 @@
 const { combineRgb, InstanceStatus } = require('@companion-module/base')
 
-
 module.exports = async function (self) {
 	self.setFeedbackDefinitions({
 		SQLQuery: {
 			type: 'advanced',
 			name: 'Update variable via SQL query',
-			description:
-				'Execute an SQL query and use its result to set the value of a variable.',
+			description: 'Execute an SQL query and use its result to set the value of a variable.',
 			options: [
 				{
 					type: 'textinput',
@@ -28,7 +26,7 @@ module.exports = async function (self) {
 					id: 'format',
 					default: self.FORMATS[1].id,
 					choices: self.FORMATS,
-				}
+				},
 			],
 			callback: () => {
 				// Nothing to do, as this feeds a variable
@@ -60,7 +58,7 @@ module.exports = async function (self) {
 			if (subscription.poll) {
 				await self.processDBRequest(subscription)
 			}
-/*			var query = await self.parseVariablesInString(subscription.sqlQuery)
+			/*			var query = await self.parseVariablesInString(subscription.sqlQuery)
 			try {
 				const [results, fields] = await self.pool.query(query)
 				if (results[0] != undefined) {
@@ -80,6 +78,5 @@ module.exports = async function (self) {
 				self.lastError = Date.now()
 			} */
 		})
-	}, self.config.pollinterval*1000)
+	}, self.config.pollinterval * 1000)
 }
-
