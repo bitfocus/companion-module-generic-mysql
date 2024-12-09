@@ -134,7 +134,7 @@ class ModuleInstance extends InstanceBase {
 		let variables = new Set()
 		let defaultValues = {}
 		this.requests.forEach((subscription, subscriptionId) => {
-			if (!subscription.variableName.match(/^[a-zA-Z0-9_]/)) {
+			if (!subscription.variableName.match(/^[a-zA-Z0-9_]+$/)) {
 				return
 			}
 			variables.add(subscription.variableName)
