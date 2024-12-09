@@ -15,15 +15,41 @@ module.exports = function (self) {
 					label: 'SQL Query',
 					useVariables: true,
 				},
+                                {
+                                        type: 'textinput',
+                                        label: 'Result Variable (optional)',
+                                        id: 'variable',
+                                        regex: '/^[a-zA-Z0-9_]+$/',
+                                        default: '',
+                                },
+                                {
+                                        type: 'dropdown',
+                                        label: 'How to store the result in the variable',
+                                        id: 'format',
+                                        default: self.FORMATS[1].id,
+                                        choices: self.FORMATS,
+					isVisible: (options) => { return options.variable != "" }
+                                },
 			],
 			callback: async (event) => {
-				var query = await self.parseVariablesInString(event.options.query)
-				try {
-					const [results, fields] = await self.pool.query(query)
-				} catch (err) {
-					self.log('error', String(err))
+				await self.processDBRequest(self.requests.get(event.id))
+			},
+			subscribe: async (action) => {
+				self.requests.set(action.id, {
+					variableName: action.options.variable,
+					sqlQuery: action.options.query,
+					value: null,
+					format: action.options.format,
+					poll: false,
+				})
+				if (self.isInitialized) {
+					self.updateVariables(action.id)
 				}
 			},
+                        unsubscribe: (action) => {
+                                self.requests.delete(action.id)
+                        },
+
 		},
 		prepSQL: {
 			name: 'Execute Prepared SQL Statement',
@@ -33,14 +59,30 @@ module.exports = function (self) {
 					type: 'static-text',
 					label: 'Please note:',
 					value:
-						'Use a question mark wherever you want to use a variable. Do not use quotes around strings. They will be added automatically. Example: INSERT INTO test (name) VALUES (?)',
+						'Use a question mark where you want to use a variable. Do not use quotes around strings, they will be added automatically. Example: INSERT INTO test (name, email) VALUES (?, ?)',
 				},
 				{
 					id: 'query',
 					type: 'textinput',
 					label: 'SQL Query',
 					useVariables: false,
+					default: '',
 				},
+                                {
+                                        type: 'textinput',
+                                        label: 'Result Variable (optional)',
+                                        id: 'variable',
+                                        regex: '/^[a-zA-Z0-9_]+$/',
+                                        default: '',
+                                },
+                                {
+                                        type: 'dropdown',
+                                        label: 'How to store the result in the variable',
+                                        id: 'format',
+                                        default: self.FORMATS[1].id,
+                                        choices: self.FORMATS,
+					isVisible: (options) => { return options.variable != "" }
+                                },
 				{
 					id: 'var1',
 					type: 'textinput',
@@ -133,20 +175,30 @@ module.exports = function (self) {
 				},
 			],
 			callback: async (event) => {
-				const matches = event.options.query.match(/\?/g)
+				await self.processDBRequest(self.requests.get(event.id))
+			},
+			subscribe: async (action) => {
+				const matches = action.options.query.match(/\?/g)
 				const parameterCount = matches ? matches.length : 0
 				var params = []
 				for (var i = 1; i <= parameterCount; i++) {
-					const p = await self.parseVariablesInString(event.options['var' + i])
-					params.push(p)
+					params.push(action.options['var' + i])
 				}
-
-				try {
-					const [results, fields] = await self.pool.execute(event.options.query, params)
-				} catch (err) {
-					self.log('error', String(err))
+				self.requests.set(action.id, {
+					variableName: action.options.variable,
+					sqlQuery: action.options.query,
+					params: params,
+					value: null,
+					format: action.options.format,
+					poll: false,
+				})
+				if (self.isInitialized) {
+					self.updateVariables(action.id)
 				}
 			},
+                        unsubscribe: (action) => {
+                                self.requests.delete(action.id)
+                        },
 		},
 	})
 }
