@@ -35,6 +35,9 @@ class ModuleInstance extends InstanceBase {
 	// When module gets deleted
 	async destroy() {
 		this.log('debug', 'destroy')
+		if (self.pollInterval != undefined) {
+			clearInterval(self.pollInterval)
+		}
 	}
 
 	async configUpdated(config) {
@@ -45,6 +48,10 @@ class ModuleInstance extends InstanceBase {
 		if (isNaN(config.pollinterval)) {
 			this.updateStatus(InstanceStatus.BadConfig, 'Poll interval must be a number')
 			return
+		}
+		if (config.pollinterval < 0.01) {
+			// limit to 10ms
+			configpollinterval = 0.01
 		}
 		this.config = config
 		await this.connect()
